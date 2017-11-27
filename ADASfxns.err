@@ -1,0 +1,8 @@
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\ADASfxns.c 66 : call of function without prototype
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\ADASfxns.c 70 : call of function without prototype
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\ADASfxns.c 78 : call of function without prototype
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\ADASfxns.c 93 : type qualifier mismatch in assignment
+Warning[2060] C:\Users\BME464\Desktop\ComboTrial\ADASfxns.c 131 : shift expression has no effect
+Warning[2060] C:\Users\BME464\Desktop\ComboTrial\ADASfxns.c 182 : shift expression has no effect
+Warning[2060] C:\Users\BME464\Desktop\ComboTrial\ADASfxns.c 185 : shift expression has no effect
+Error[1521] C:\Users\BME464\Desktop\ComboTrial\ADASfxns.c 208 : This feature is not implemented in compiler. There may be a definition of external symbol 'FillingCnt' found instead of its declaration

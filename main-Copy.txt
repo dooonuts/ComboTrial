@@ -1,0 +1,90 @@
+/* 
+ * File:   Serial_Trial/main.c
+ * Author: Daniel
+ *
+ * Created on October 16, 2017, 3:26 PM
+ */
+
+#pragma config WDTEN=OFF
+#pragma config FOSC=INTIO67
+#pragma config XINST=OFF
+
+#include "funcdec.h"
+#include <p18f46k22.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "ADAS1000.h"
+#include "Communication.h"
+
+//#define SPI_ENABLE          SSP1CON1bits.SSPEN
+//#define SPI_CLOCK_POLARITY  SSP1CON1bits.CKP
+//#define SPI_FOSCbit0        SSP1CON1bits.SSPM0 //Set Clock to run on FOSC/4 for SPI 
+//#define SPI_FOSCbit1        SSP1CON1bits.SSPM1
+//#define SPI_FOSCbit2        SSP1CON1bits.SSPM2
+//#define SPI_FOSCbit3        SSP1CON1bits.SSPM3
+//#define SPI_CLOCK_EDGE      SSP1STATbits.CKE
+//#define SPI_SAMPLING        SSP1STATbits.SMP
+//#define SPI_CLOCK_DIR       TRISCbits.RC3
+//#define SPI_DATA_IN         TRISCbits.RC4
+//#define SPI_SLAVE_SELECT    TRISAbits.RA5
+//#define SPI_DATA_OUT        TRISCbits.RC5
+//#define SPI_DATA_BUFFER     SSP1BUFbits.SSPBUF
+//#define SPI_DATA_CHECK      SSP1STATbits.BF
+
+int main(int argc, char** argv) {
+    /* Initialize the SPI interface with the ADAS */
+    int init = 0;
+    init = ADAS1000_Init(ADAS1000_2KHZ_FRAME_RATE);
+    
+    /* Set the CS (chip select) to HIGH as default state */
+    /* CS is used to frame the data and must be included in the code.
+     * When CS falls LOW, it begins the frame. When CS is brought HIGH,
+     * the frame ends.
+     */
+    LATAbits.LA0 = 1;
+    
+    /* Set up the LEDs */
+    ANSELB = 0b00000000; 
+    TRISB = 0b00000000;
+    
+    /* Set the PIC clock frequency */
+    OSCCON = 0b01100110; // set clock to 8 MHz
+    
+    /* Turn off the light */
+    LATB = 0;
+    
+    /* If the ADAS initialized correctly*/
+    if(init){
+        
+        /* Turn on the light */
+        LATB = 1;
+        
+        /* Set the register values of the ADAS */
+        //ADAS1000_SetRegisterValue(0x01,0b111110000000000010111110);
+        // ADAS1000_SetRegisterValue(0x0A, 0b000001111111110001000000);
+        
+        /* Keep doing this forever (for testing purposes) */
+        while(1){
+            /* Initialize pointers to store ADAS register values*/
+            unsigned long* foo1;
+            unsigned long* foo2;
+            unsigned long* foo3;
+            
+            /* Get the register value of the ADAS */
+            ADAS1000_GetRegisterValue(0x01, foo1);
+            ADAS1000_GetRegisterValue(0x0A, foo2);
+            ADAS1000_GetRegisterValue(0x0C, foo3);
+            
+            /* Store the ADAS register values in variables */
+            unsigned long bar1 = *foo1;
+            unsigned long bar2 = *foo2;
+            unsigned long bar3 = *foo3;
+            
+            /* Set the register value of the ADAS */
+            // ADAS1000_SetRegisterValue(0x01,0b111110000000000010111110);
+        } 
+   }
+    
+    /* Return to notify successful execution of main() */
+    return (EXIT_SUCCESS);
+}

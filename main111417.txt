@@ -1,0 +1,308 @@
+/* 
+ * File:   Serial_Trial2/main.c
+ * Author: Daniel
+ * Accurately outputs ECG data to the logic Analyzer, next steps are to swap buffers
+ * Created on October 16, 2017, 3:26 PM
+ */
+
+#pragma config WDTEN=OFF
+#pragma config FOSC=INTIO67
+#pragma config XINST=OFF
+
+#include "Lcd.h"
+#include "funcdec.h"
+// #include <pic18f46k22.h>
+#include <p18f46k22.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "ADAS1000.h"
+#include "Communication.h"
+
+char FillingCnt;
+unsigned char *FillingBuffPnt;
+unsigned char *BufferAPnt, *BufferBPnt;
+unsigned long *data;
+char FillingBuff;
+char radioBuff;
+unsigned char logicAnalyzerOutputEnable = 1;            //true if outputting
+
+void InitLogicAnalyzerOut(){
+    // logic analyzer output puts data on the output pins that can be read by the anlyzer
+    // It outputs 1 byte and a clock as follows:
+    // Data bits 0-3  output on Port E 0-2 and Port A 4
+    // Data bits 4-7  output on Port B 4-7
+    // Clock output on Port A 5
+    // This routine initializes the ports
+    TRISBbits.RB4 = 0;
+    TRISBbits.RB5 = 0;
+    TRISBbits.RB6 = 0;
+    TRISBbits.RB7 = 0;
+    TRISEbits.RE0 = 0;
+    TRISEbits.RE1 = 0;
+    TRISEbits.RE2 = 0;
+    TRISAbits.RA4 = 0;
+    TRISAbits.RA5 = 0; 
+}
+
+void ProcessSample(){
+    char StartBuffer0, StartBuffer1, FillingBuffPnt;
+   
+    if (FillingBuff=0){
+        FillingBuffPnt = StartBuffer0;
+    }
+    else{
+        FillingBuffPnt = StartBuffer1;
+    }    
+}
+
+void SwapBuffers(){
+    *FillingBuffPnt = *data;
+    FillingCnt++;
+    if(FillingCnt == 32){
+        if(FillingBuff==0){
+            SwapFill0();
+            radioBuff=0;
+        }
+        else {
+            SwapFill1();
+            radioBuff=1;
+        }
+    }
+}
+
+void SwapFill0(){
+    FillingBuff=1;
+    FillingBuffPnt = BufferAPnt;
+}
+
+void SwapFill1(){
+    FillingBuff=0;
+    FillingBuffPnt = BufferBPnt;
+}
+
+/***************************************************************************//**
+ * @brief Prints a register value from the ADAS.
+ *
+ * @param regVal - value read from the register
+ * 
+ * @return None.
+*******************************************************************************/
+void LCDWriteADAS(unsigned long regVal) {
+    int i;
+    char str[8];
+    sprintf(str, "%08lX", regVal);
+    for (i = 0; i < 8; i++) {
+        LCDPutChar(str[i]);
+    }
+}
+void ADAS_TEST_TONE(){
+    unsigned char readCmd[4] = {0, 0, 0, 0};
+    
+    ADAS1000_SetRegisterValue(ADAS1000_CMREFCTL, \
+        ADAS1000_CMREFCTL_DRVCM | ADAS1000_CMREFCTL_RLD_EN | ADAS1000_CMREFCTL_SHLDEN);
+    
+    ADAS1000_SetRegisterValue(ADAS1000_TESTTONE, \
+        ADAS1000_TESTTONE_TONLA | ADAS1000_TESTTONE_TONLL | ADAS1000_TESTTONE_TONRA |  \
+        ADAS1000_TESTTONE_TONV1 | ADAS1000_TESTTONE_TONV2 | \
+        ADAS1000_TESTTONE_TONINT | ADAS1000_TESTTONE_TONEN);
+    
+    ADAS1000_SetRegisterValue( ADAS1000_FILTCTL, (0b10ul<<2));
+    
+    ADAS1000_SetRegisterValue( ADAS1000_FRMCTL, \
+        ADAS1000_FRMCTL_PACEDIS | ADAS1000_FRMCTL_RESPMDIS | ADAS1000_FRMCTL_RESPPHDIS | \
+        ADAS1000_FRMCTL_GPIODIS | ADAS1000_FRMCTL_LOFFDIS | ADAS1000_FRMCTL_CRCDIS | \
+        ADAS1000_FRMCTL_DATAFMT | ADAS1000_FRMCTL_SKIP_1FRM);
+    
+    ADAS1000_SetInactiveFrameWords( \
+        ADAS1000_FRMCTL_PACEDIS | ADAS1000_FRMCTL_RESPMDIS | ADAS1000_FRMCTL_RESPPHDIS | \
+        ADAS1000_FRMCTL_GPIODIS | ADAS1000_FRMCTL_LOFFDIS |ADAS1000_FRMCTL_CRCDIS);
+    
+    ADAS1000_SetRegisterValue(ADAS1000_ECGCTL, \
+        ADAS1000_ECGCTL_LAEN | ADAS1000_ECGCTL_LLEN | ADAS1000_ECGCTL_RAEN | \
+        ADAS1000_ECGCTL_V1EN | ADAS1000_ECGCTL_V2EN | ADAS1000_ECGCTL_VREFBUF | \
+        ADAS1000_ECGCTL_MASTER | ADAS1000_ECGCTL_HP | ADAS1000_ECGCTL_CNVEN | \
+        ADAS1000_ECGCTL_PWREN);
+    
+    /* Get Frame Register without reading second time, starts */
+    readCmd[0] = ADAS1000_FRAMES;	// Register address.
+	SPI_Write(readCmd, 4);
+}
+/* Set the register values of the ADAS */
+void ADAS_DATA_INIT(){
+    unsigned char readCmd[4] = {0, 0, 0, 0};
+    
+    /* Set Common Mode Electrodes */
+    
+    //0b111000000000000000001011
+    //ADAS1000_SetRegisterValue(ADAS1000_CMREFCTL, \
+        ADAS1000_CMREFCTL_LACM | ADAS1000_CMREFCTL_LLCM | ADAS1000_CMREFCTL_RACM | \
+        ADAS1000_CMREFCTL_DRVCM | ADAS1000_CMREFCTL_RLD_EN | ADAS1000_CMREFCTL_SHLDEN);
+    
+    //0b100000000000000000000011
+    // ADAS1000_SetRegisterValue(ADAS1000_CMREFCTL, \
+    //     ADAS1000_CMREFCTL_DRVCM | ADAS1000_CMREFCTL_SHLDEN);
+    ADAS1000_SetRegisterValue(ADAS1000_CMREFCTL, \
+         ADAS1000_CMREFCTL_DRVCM | ADAS1000_CMREFCTL_RLD_EN );
+    /* Set Frame Control Register */
+    // For output every 4th frame 011111111111111000011000
+    
+    //0b000001111001011000000000
+    //ADAS1000_SetRegisterValue(ADAS1000_FRMCTL, \
+        ADAS1000_FRMCTL_V1DIS | ADAS1000_FRMCTL_V2DIS | ADAS1000_FRMCTL_LOFFDIS | \
+        ADAS1000_FRMCTL_PACEDIS | ADAS1000_FRMCTL_RESPMDIS | ADAS1000_FRMCTL_RESPPHDIS | \
+        ADAS1000_FRMCTL_GPIODIS | ADAS1000_FRMCTL_CRCDIS | ADAS1000_FRMCTL_RDYRPT | \
+        ADAS1000_FRMCTL_SKIP_4FRM);
+    
+    //0b011111111111111000010000
+    ADAS1000_SetRegisterValue(ADAS1000_FRMCTL, \
+        ADAS1000_FRMCTL_LEAD_II_LLDIS | ADAS1000_FRMCTL_LEAD_III_RADIS | ADAS1000_FRMCTL_V1DIS | \
+        ADAS1000_FRMCTL_V2DIS | ADAS1000_FRMCTL_PACEDIS | ADAS1000_FRMCTL_RESPMDIS | \
+        ADAS1000_FRMCTL_RESPPHDIS | ADAS1000_FRMCTL_GPIODIS | ADAS1000_FRMCTL_LOFFDIS | \
+        ADAS1000_FRMCTL_CRCDIS | ADAS1000_FRMCTL_DATAFMT | ADAS1000_FRMCTL_SKIP_4FRM);
+    
+    ADAS1000_SetInactiveFrameWords( \
+        ADAS1000_FRMCTL_LEAD_II_LLDIS | ADAS1000_FRMCTL_LEAD_III_RADIS | ADAS1000_FRMCTL_V1DIS | \
+        ADAS1000_FRMCTL_V2DIS | ADAS1000_FRMCTL_PACEDIS | ADAS1000_FRMCTL_RESPMDIS | \
+        ADAS1000_FRMCTL_RESPPHDIS | ADAS1000_FRMCTL_GPIODIS | ADAS1000_FRMCTL_LOFFDIS | \
+        ADAS1000_FRMCTL_CRCDIS);
+    
+    /* Set ECG Control Register */
+    
+    //0b111110000000010010101110
+    //ADAS1000_SetRegisterValue(ADAS1000_ECGCTL, \
+        ADAS1000_ECGCTL_LAEN | ADAS1000_ECGCTL_LLEN |  ADAS1000_ECGCTL_RAEN | \
+        ADAS1000_ECGCTL_CHCONFIG | ADAS1000_ECGCTL_VREFBUF | ADAS1000_ECGCTL_MASTER | \
+        ADAS1000_ECGCTL_HP | ADAS1000_ECGCTL_CNVEN | ADAS1000_ECGCTL_PWREN | \
+        ADAS1000_ECGCTL_GAIN_2_8 | ADAS1000_ECGCTL_GANG);
+    
+    //ADAS1000_SetRegisterValue(ADAS1000_ECGCTL, \
+        ADAS1000_ECGCTL_LAEN | ADAS1000_ECGCTL_LLEN |  ADAS1000_ECGCTL_RAEN | \
+        ADAS1000_ECGCTL_CHCONFIG | ADAS1000_ECGCTL_VREFBUF |  ADAS1000_ECGCTL_MASTER | \
+        ADAS1000_ECGCTL_HP | ADAS1000_ECGCTL_CNVEN | ADAS1000_ECGCTL_PWREN );
+    
+    //0b100000000000000010111110);
+    ADAS1000_SetRegisterValue(ADAS1000_ECGCTL, \
+        ADAS1000_ECGCTL_LAEN | ADAS1000_ECGCTL_VREFBUF | ADAS1000_ECGCTL_MASTER | \
+        ADAS1000_ECGCTL_HP | ADAS1000_ECGCTL_CNVEN | ADAS1000_ECGCTL_GAIN_4_2 | \
+        ADAS1000_ECGCTL_PWREN);
+    
+    /* Get Frame Register without reading second time, starts */
+    readCmd[0] = ADAS1000_FRAMES;	// Register address.
+	SPI_Write(readCmd, 4);
+}
+
+// allocate a buffer for storing a frame. It is the max frame size for 2k
+// data(12) and the word size is in bits (32). This buffer should be 48 bytes.
+// THis means that you can NEVER read more than one frame at a time into this buffer
+// unless you calculate how many of the new frame size packets can fit into a 48 byte buffer.
+unsigned char data_buffer[48];
+// unsigned long data_buffer[12];
+
+void main() {
+    /* Initialize variables used in the function */
+    int init, i, skip_time;
+    
+    /* Initialize variables to read streamed data from the ADAS */
+    
+    //unsigned long framecount = 1;   // number of frames to read (see above)
+    //unsigned char startRead = 0;    // initialize ADAS streaming
+    //unsigned char stopRead = 0;     // terminate ADAS streaming
+    //unsigned char waitForReady = 1; // wait until data is ready
+    //unsigned char readyRepeat = 1;  // repeat header until data is read
+    unsigned long newdata;
+    
+    /* Initialize the LCD */
+    ANSELD = 0x00; // turn on digital input buffer
+    TRISD =  0x00; // LCD digital pins to output
+    LCDInit();
+    
+    /* Initialize the SPI interface with the ADAS */
+    init = 0;
+    init = ADAS1000_Init(ADAS1000_2KHZ_FRAME_RATE);
+    
+    /* Set the directions of the pins for the SPI interface */
+    TRISAbits.RA0 = 0; // CS (chip select) is output
+    TRISAbits.RA2 = 0; // RESET is output
+    TRISAbits.RA3 = 1; // DRDY (data ready) is input
+    ANSELAbits.ANSA3 = 0; // clear analog for DRDY
+            
+    /* Set the CS (chip select) to HIGH as default state */
+    /* CS is used to frame the data and must be included in the code.
+     * When CS falls LOW, it begins the frame. When CS is brought HIGH,
+     * the frame ends.
+     */
+    LATAbits.LATA0 = 1; // Chip Select goes HIGH
+    LATAbits.LATA2 = 1; // RESET is at HIGH
+    
+
+    /* Set the PIC clock frequency */
+    OSCCON = 0b01110110; // set clock to 16 MHz 
+    
+    // init ports for logic analyzer output
+    InitLogicAnalyzerOut();
+    
+    /* If the ADAS initialized correctly */
+    if(init){
+        
+        ADAS_DATA_INIT();
+        //ADAS_TEST_TONE();
+        
+        /* Keep doing this forever (for testing purposes) */
+        while(1){
+            //ADAS1000_ReadData((unsigned char *)data_buffer, framecount, \
+                startRead, stopRead, waitForReady, readyRepeat); 
+            
+            ADAS1000_ReadFrame((unsigned char *)data_buffer);
+            
+            if(logicAnalyzerOutputEnable){
+                newdata = ((unsigned long)data_buffer[5] << 16) +
+                          ((unsigned long)data_buffer[6] << 8) +
+                          ((unsigned long)data_buffer[7] << 0);
+                
+                newdata = newdata >> 16; // & 0b11111ul; // >> 6; // shift to get highest order bits in low byte
+                
+                if (newdata & 0x01) LATEbits.LATE0 = 1;
+                else LATEbits.LATE0 = 0;
+                if (newdata & 0x02) LATEbits.LATE1 = 1;
+                else LATEbits.LATE1 = 0;
+                if (newdata & 0x04) LATEbits.LATE2 = 1;
+                else LATEbits.LATE2 = 0;
+                if (newdata & 0x08) LATAbits.LATA4 = 1;
+                else LATAbits.LATA4 = 0;
+                if (newdata & 0x10) LATBbits.LATB4 = 1;
+                else LATBbits.LATB4 = 0;
+                if (newdata & 0x20) LATBbits.LATB5 = 1;
+                else LATBbits.LATB5 = 0;
+                if (newdata & 0x40) LATBbits.LATB6 = 1;
+                else LATBbits.LATB6 = 0;
+                if (newdata & 0x80) LATBbits.LATB7 = 1;
+                else LATBbits.LATB7 = 0;
+                        
+                LATAbits.LATA5 = 1;
+                LATAbits.LATA5 = 0;
+            }
+            
+            
+            /*ch1 = data_buffer;
+            
+            LATE = (ch1 >> 5) & 0b00000110; 
+            LATB = (ch1) & 0b00111111;
+            
+            LATEbits.LATE0 = 1; // toggle the Logic Analyzer clock with a pulse
+            LATEbits.LATE0 = 0;*/
+            
+            /* Get the register value of the ADAS */
+            //ADAS1000_GetRegisterValue(0x01, &foo1);
+            //ADAS1000_GetRegisterValue(0x0A, &foo2);
+            //ADAS1000_GetRegisterValue(0x0C, &foo3);
+
+            /* Print ADAS register values onto the LCD */
+
+            //LCDGoto(0,0);
+            //LCDWriteADAS(foo1);
+
+            //LCDGoto(0,1);
+            //LCDWriteADAS(foo3);
+        } 
+   }
+}

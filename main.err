@@ -1,0 +1,24 @@
+Warning[2068] C:\Users\BME464\Desktop\ComboTrial\main.c 24 : obsolete use of implicit 'int' detected
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\main.c 107 : call of function without prototype
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\main.c 121 : call of function without prototype
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\main.c 134 : call of function without prototype
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\main.c 158 : call of function without prototype
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\main.c 160 : call of function without prototype
+Warning[2060] C:\Users\BME464\Desktop\ComboTrial\main.c 183 : shift expression has no effect
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\main.c 225 : call of function without prototype
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\main.c 238 : type qualifier mismatch in assignment
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\main.c 242 : call of function without prototype
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\main.c 244 : type qualifier mismatch in assignment
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\main.c 252 : call of function without prototype
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\main.c 260 : call of function without prototype
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\main.c 273 : type qualifier mismatch in assignment
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\main.c 277 : call of function without prototype
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\main.c 279 : type qualifier mismatch in assignment
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\main.c 287 : call of function without prototype
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\main.c 295 : call of function without prototype
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\main.c 306 : type qualifier mismatch in assignment
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\main.c 307 : call of function without prototype
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\main.c 309 : type qualifier mismatch in assignment
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\main.c 319 : type qualifier mismatch in assignment
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\main.c 320 : call of function without prototype
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\main.c 322 : type qualifier mismatch in assignment
