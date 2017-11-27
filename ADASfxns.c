@@ -11,7 +11,7 @@
 #include "Communication.h"
 #include "General.h"
 
-
+//unsigned char                 // for pacing
 unsigned long ADAS1000_RegVal_ECGCTL;
 unsigned long ADAS1000_RegVal_CMREFCTL;
 unsigned long ADAS1000_RegVal_TESTTONE;
@@ -208,3 +208,4 @@ void ADAS_TEST_TONE(){
 //    readCmd[0] = ADAS1000_FRAMES;	// Register address.
 //	SPI_Write(readCmd, 4);
 }
+
