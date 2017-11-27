@@ -112,68 +112,12 @@ void main() {
     radioBuff=1;
     FillingCnt = 0;
     
-    for(i=0;i<64;i++)Buffer0[i] = 0;
+    for(i=0;i<64;i++)Buffer0[i] = 0;    // Generate the Buffer
             
-    doneRadioBuff = 1;               // this makes the radio xmission wait for the first data buffer to fill;
     nBuffersOfData = 0;                 // buffers of data counter
-    lastRadioBuff = 0;
    
     ADAS_DATA_INIT();                //configure and start the ADAS data flow
-    /* Keep doing this until we acquire the correct number of buffers */
-    do {
-        if (ADAS_DATA_NOT_READY || lastRadioBuff){ // When no ADAS data available or its the last buffer
-            if (!doneRadioBuff){ // If still emptying radio buffer
-                head_tail_diff = txHead - txTail;
-                if (head_tail_diff < 0) head_tail_diff += MAX_OUT_BUF_SZ;
-                if (MAX_OUT_BUF_SZ-head_tail_diff >= 4){       // is there room for another 4 byte sample
-                    // get next 4 bytes from radio buffer and send to Tx Buffer
-                    SERTxSave(*radiodataptr++);
-                    SERTxSave(*radiodataptr++);
-                    SERTxSave(*radiodataptr++);
-                    SERTxSave(*radiodataptr++);
-                    if (++RadioCnt >= 16) endRadioTransmission();       //radio buff sample counter             
-                }
-                     // end of radio buffer?  send the cr lf
-                     //         and don't do this again until buffers swap'
-            }
-        }
-        else {                                            // if there is ADAS data
-            SPI_Read(data_buffer, 8);                                   // read the next data packet
-            *FillingBuffPnt = ((data_buffer[5] >> 4) & 0x0F) + '0'; // store ASCII of high nibble high byte
-            if(*FillingBuffPnt > '9')*FillingBuffPnt += 7;          //converts to true HEX
-            FillingBuffPnt++;
-
-            *FillingBuffPnt = (data_buffer[5] & 0x0F) + '0';    // store ASCII of low nibble high byte
-            if(*FillingBuffPnt > '9')*FillingBuffPnt += 7;          //converts to true HEX
-            FillingBuffPnt++;
-
-            *FillingBuffPnt = ((data_buffer[6] >> 4) & 0x0F) +'0';    // store ASCII of high nibble low byte
-            if(*FillingBuffPnt > '9')*FillingBuffPnt += 7;          //converts to true HEX
-            FillingBuffPnt++;
-
-            *FillingBuffPnt = (data_buffer[6] & 0x0F) + '0';    // store ASCII of low nibble low byte
-            if(*FillingBuffPnt > '9')*FillingBuffPnt += 7;          //converts to true HEX
-            FillingBuffPnt++;
-
-            if(logicAnalyzerOutputEnable)outputToLogicAnalyzer();
-            if (++FillingCnt >= 16) {
-                SwapBuffers();
-                if (++nBuffersOfData >= nTotalBuffersOfData) break;         // break out of do while loop
-            }
-        /*ch1 = data_buffer;
-
-        LATE = (ch1 >> 5) & 0b00000110; 
-        LATB = (ch1) & 0b00111111;
-
-        LATEbits.LATE0 = 1; // toggle the Logic Analyzer clock with a pulse
-        LATEbits.LATE0 = 0;*/
-        }                       // end else there is ADAS data
-    } while (1);                    // only way out is by break;
-    // wait for last radio buffer xmission to finish
-    ADAS1000_GetRegisterValue(ADAS1000_FRMCTL, &ADASdata);               // stop ADAS data mode
-    lastRadioBuff = 1;
-    while (!doneRadioBuff);   
-    while(1);       // just idle             
+                
 }
 
 void outputToLogicAnalyzer() {
