@@ -51,34 +51,34 @@ void InitLogicAnalyzerOut(){
     TRISAbits.RA4 = 0;
     TRISAbits.RA5 = 0; 
 }
-void SwapBuffers(){
-    if(FillingBuff==0){
-        FillingBuff=1;
-        FillingBuffPnt = Buffer1;
-        radioBuff=0;
-    }
-    else {
-        FillingBuff=0;
-        FillingBuffPnt = Buffer0;
-        radioBuff=1;
-        }
-    FillingCnt = 0;
-    startRadioTransmission();
-}
-
-void startRadioTransmission (){
-    SERSendStr("radio tx ");
-    doneRadioBuff=0; // radio tx, initialize which buffer is which
-    RadioCnt = 0;
-    // If Filling Buffer is pointing to Buffer0, then read from Buffer1
-    if(FillingBuffPnt == Buffer0)radiodataptr = Buffer1;
-    else radiodataptr = Buffer0;
-}
-void endRadioTransmission (){
-    SERSendStr("\r\n"); //append char return line feed
-    doneRadioBuff=1;
-    lastRadioBuff=0;
-}
+//void SwapBuffers(){
+//    if(FillingBuff==0){
+//        FillingBuff=1;
+//        FillingBuffPnt = Buffer1;
+//        radioBuff=0;
+//    }
+//    else {
+//        FillingBuff=0;
+//        FillingBuffPnt = Buffer0;
+//        radioBuff=1;
+//        }
+//    FillingCnt = 0;
+//    startRadioTransmission();
+//}
+//
+//void startRadioTransmission (){
+//    SERSendStr("radio tx ");
+//    doneRadioBuff=0; // radio tx, initialize which buffer is which
+//    RadioCnt = 0;
+//    // If Filling Buffer is pointing to Buffer0, then read from Buffer1
+//    if(FillingBuffPnt == Buffer0)radiodataptr = Buffer1;
+//    else radiodataptr = Buffer0;
+//}
+//void endRadioTransmission (){
+//    SERSendStr("\r\n"); //append char return line feed
+//    doneRadioBuff=1;
+//    lastRadioBuff=0;
+//}
 
 /***************************************************************************//**
  * @brief Prints a register value from the ADAS.
@@ -166,12 +166,12 @@ void ADAS_DATA_INIT(){
     ADAS1000_SetRegisterValue(ADAS1000_ECGCTL, ADAS1000_RegVal_ECGCTL);
     
     /* Get Frame Register without reading second time, starts */
-    readCmd[0] = ADAS1000_FRAMES;	// Register address.
-	SPI_Write(readCmd, 4);
+//    readCmd[0] = ADAS1000_FRAMES;	// Register address.
+//	SPI_Write(readCmd, 4);
 }
 
 void ADAS_TEST_TONE(){
-    unsigned char readCmd[4] = {0, 0, 0, 0};
+ //   unsigned char readCmd[4] = {0, 0, 0, 0};
     
     ADAS1000_RegVal_ECGCTL = \
         ADAS1000_ECGCTL_LAEN | ADAS1000_ECGCTL_LLEN | ADAS1000_ECGCTL_RAEN | \
@@ -188,9 +188,10 @@ void ADAS_TEST_TONE(){
         ADAS1000_TESTTONE_TONINT | ADAS1000_TESTTONE_TONEN;
     
     ADAS1000_RegVal_FRMCTL = \
-        ADAS1000_FRMCTL_PACEDIS | ADAS1000_FRMCTL_RESPMDIS | ADAS1000_FRMCTL_RESPPHDIS | \
+        ADAS1000_FRMCTL_LEAD_II_LLDIS | ADAS1000_FRMCTL_LEAD_III_RADIS | ADAS1000_FRMCTL_V1DIS | \
+        ADAS1000_FRMCTL_V2DIS | ADAS1000_FRMCTL_PACEDIS | ADAS1000_FRMCTL_RESPMDIS | ADAS1000_FRMCTL_RESPPHDIS | \
         ADAS1000_FRMCTL_GPIODIS | ADAS1000_FRMCTL_LOFFDIS | ADAS1000_FRMCTL_CRCDIS | \
-        ADAS1000_FRMCTL_DATAFMT | ADAS1000_FRMCTL_SKIP_1FRM;
+        ADAS1000_FRMCTL_DATAFMT | ADAS1000_FRMCTL_SKIP_4FRM;
             
     ADAS1000_SetRegisterValue(ADAS1000_CMREFCTL, ADAS1000_RegVal_CMREFCTL);
     
@@ -204,6 +205,6 @@ void ADAS_TEST_TONE(){
     ADAS1000_SetRegisterValue(ADAS1000_ECGCTL, ADAS1000_RegVal_ECGCTL);
     
     /* Get Frame Register without reading second time, starts */
-    readCmd[0] = ADAS1000_FRAMES;	// Register address.
-	SPI_Write(readCmd, 4);
+//    readCmd[0] = ADAS1000_FRAMES;	// Register address.
+//	SPI_Write(readCmd, 4);
 }

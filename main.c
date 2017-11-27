@@ -24,8 +24,7 @@
 extern GetRegisterValue();
 
 unsigned char data_buffer[48];
-unsigned char logicAnalyzerOutputEnable = 1;            //true if outputting
-unsigned char FillingCnt = 0;    //counts in samples (not bytes))
+unsigned char logicAnalyzerOutputEnable = 0;            //true if outputting
 unsigned char RadioCnt = 0;
 unsigned char *FillingBuffPnt;   
 unsigned long ADASdata;
@@ -106,18 +105,10 @@ void main() {
     // initialize ports for logic analyzer output
     InitLogicAnalyzerOut();
     
-    // Init swinging buffers
-    FillingBuff=0;                         
-    FillingBuffPnt = Buffer0;
-    radioBuff=1;
-    FillingCnt = 0;
-    
-    for(i=0;i<64;i++)Buffer0[i] = 0;    // Generate the Buffer
-            
-    nBuffersOfData = 0;                 // buffers of data counter
-   
-    ADAS_DATA_INIT();                //configure and start the ADAS data flow
-                
+//   ADAS_DATA_INIT();                //configure and start the ADAS data flow
+    ADAS_TEST_TONE();
+    AcquireECGData(25);
+    while(1);
 }
 
 void outputToLogicAnalyzer() {
@@ -149,33 +140,40 @@ void outputToLogicAnalyzer() {
     LATAbits.LATA5 = 0;
 }                               // end if logicAnalyzer
 
+// finite state machine for acquiring data from the ADAS and sending it out over the 
+// RS232 the transmit buffer.
 void AcquireECGData (unsigned int nTotalBuffersOfData)
 {
     unsigned char acquireState = 0;
     int nBuffersOfData = 0;
     unsigned char radioCnt, FillingCounter;
-    unsigned long ready;
+    unsigned char readCmd[4] = {0, 0, 0, 0};
     
-    while (acquireState <= 10){
+    while (acquireState <= 12){
         switch (acquireState){
             case 0:
                 // Init buffer 0
                 FillingBuffPnt = Buffer0;       // set the pointer
                 FillingCounter = 0;                 // Init Counter
                 acquireState = 1;
+                readCmd[0] = ADAS1000_FRAMES;	// Register address.
+                SPI_Write(readCmd, 4);
                 break;
             case 1:                              // Fill buf 0, no radio xmit
                 while (ADAS_DATA_NOT_READY);                                // wait for data from ADAS
                 readFormatStoreSample();
                 if (++FillingCounter >= 16) {
                     acquireState = 2; 
-                    if (++nBuffersOfData >= nTotalBuffersOfData) acquireState = 8;         // case of only one buffer
+                    if (++nBuffersOfData >= nTotalBuffersOfData) {
+                        ADAS1000_GetRegisterValue(ADAS1000_FRMCTL, readCmd);    // stop ADAS
+                        acquireState = 8;         // case of only one buffer    
+                    }
                 }
                 FillingBuffPnt++;
                 break;
             case 2:                                                     // Init Fill buf 1, empty buf 0;
                 FillingBuffPnt = Buffer1;       // set the pointer
-                FillingCnt = 0;                 // Init Counter
+                FillingCounter = 0;                 // Init Counter
                 radiodataptr = Buffer0;
                 radioCnt = 0;
                 acquireState = 3;
@@ -202,15 +200,18 @@ void AcquireECGData (unsigned int nTotalBuffersOfData)
             case 4:                                              //finish Fill buf 1, no radio xmit
                 while (ADAS_DATA_NOT_READY);                                // wait for data from ADAS
                 readFormatStoreSample();
-                if (++FillingCnt >= 16) {                           // filling buffer full?
+                if (++FillingCounter >= 16) {                           // filling buffer full?
                     acquireState = 5;                                   // swap
-                    if (++nBuffersOfData >= nTotalBuffersOfData) acquireState = 8;         // finished collecting
+                    if (++nBuffersOfData >= nTotalBuffersOfData) {
+                        ADAS1000_GetRegisterValue(ADAS1000_FRMCTL, readCmd);    // stop ADAS
+                        acquireState = 10;         // go to ending state
+                    }   
                     break;
                 }
                 break;
             case 5:
                 FillingBuffPnt = Buffer0;       // set the pointer
-                FillingCnt = 0;                 // Init Counter
+                FillingCounter = 0;                 // Init Counter
                 radiodataptr = Buffer1;
                 radioCnt = 0;
                 acquireState = 6;
@@ -237,39 +238,43 @@ void AcquireECGData (unsigned int nTotalBuffersOfData)
             case 7:                                              //finish Fill buf 0, no radio xmit
                 while (ADAS_DATA_NOT_READY);                                // wait for data from ADAS
                 readFormatStoreSample();
-                if (++FillingCnt >= 16) {                           // filling buffer full?
+                if (++FillingCounter >= 16) {                           // filling buffer full?
                     acquireState = 2;                                   // swap
-                    if (++nBuffersOfData >= nTotalBuffersOfData) acquireState = 9;         // finished collecting
+                    if (++nBuffersOfData >= nTotalBuffersOfData) {
+                        ADAS1000_GetRegisterValue(ADAS1000_FRMCTL, readCmd);    // stop ADAS
+                        acquireState = 8;         // go to ending state
+                    }   
                     break;
                 }
                 break;
             case 8:                                         // transmit only from 0, no data colloect
-                ADAS1000_GetRegisterValue(ADAS1000_FRMCTL, &ready);    // stop ADAS
                 radiodataptr = Buffer0;
                 radioCnt = 0;
                 SERSendStr("radio tx ");
+                acquireState = 9;
+            case 9:
                 if (moveRadioSample()) {                //  4 spots available? store else not
                     if (++radioCnt >= 16) {             //radio buff sample counter 
-                        SERSendStr("\r\n"); //append char return line feed
-                        acquireState = 10;       
+                        acquireState = 12;       
                         break;
                     }
                 }
                 break;
-            case 9:                                         // transmit only from 1, no data colloect
-                ADAS1000_GetRegisterValue(ADAS1000_FRMCTL, &ready);    // stop ADAS
+            case 10:                                         // transmit only from 1, no data colloect
                 radiodataptr = Buffer1;
                 radioCnt = 0;
                 SERSendStr("radio tx ");
+                acquireState = 11;
+            case 11:
                 if (moveRadioSample()) {                //  4 spots available? store else not
                     if (++radioCnt >= 16) {             //radio buff sample counter 
-                        SERSendStr("\r\n"); //append char return line feed
-                        acquireState = 10;
+                        acquireState = 12;
                         break;
                     }
                 }
                 break;
-            case 10:
+            case 12:
+                SERSendStr("\r\n");                     //append char return line feed
                 return;
         }
     }
