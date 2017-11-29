@@ -10,13 +10,13 @@
 
 
 
-UINT8_T recCommand(void);
+unsigned char recCommand(void);
 void wakeADAS(void);
 void setPacingParam(void);
 void setADASregister(void);
-UINT8_T setDt(void);
+unsigned char setDt(void);
 void startPacing(void);
-void acquireData(UINT8_T);
+void acquireData(unsigned int);
 void stopPacing(void);
 void resetParams(void);
 char* parseSerial(void);  //unsure how to declare this.  I want a char array[32]

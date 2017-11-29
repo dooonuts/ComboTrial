@@ -51,34 +51,6 @@ void InitLogicAnalyzerOut(){
     TRISAbits.RA4 = 0;
     TRISAbits.RA5 = 0; 
 }
-//void SwapBuffers(){
-//    if(FillingBuff==0){
-//        FillingBuff=1;
-//        FillingBuffPnt = Buffer1;
-//        radioBuff=0;
-//    }
-//    else {
-//        FillingBuff=0;
-//        FillingBuffPnt = Buffer0;
-//        radioBuff=1;
-//        }
-//    FillingCnt = 0;
-//    startRadioTransmission();
-//}
-//
-//void startRadioTransmission (){
-//    SERSendStr("radio tx ");
-//    doneRadioBuff=0; // radio tx, initialize which buffer is which
-//    RadioCnt = 0;
-//    // If Filling Buffer is pointing to Buffer0, then read from Buffer1
-//    if(FillingBuffPnt == Buffer0)radiodataptr = Buffer1;
-//    else radiodataptr = Buffer0;
-//}
-//void endRadioTransmission (){
-//    SERSendStr("\r\n"); //append char return line feed
-//    doneRadioBuff=1;
-//    lastRadioBuff=0;
-//}
 
 /***************************************************************************//**
  * @brief Prints a register value from the ADAS.
@@ -164,10 +136,6 @@ void ADAS_DATA_INIT(){
     ADAS1000_SetInactiveFrameWords(ADAS1000_RegVal_FRMCTL & ADAS1000_FRMCTL_WORD_MASK);
     
     ADAS1000_SetRegisterValue(ADAS1000_ECGCTL, ADAS1000_RegVal_ECGCTL);
-    
-    /* Get Frame Register without reading second time, starts */
-//    readCmd[0] = ADAS1000_FRAMES;	// Register address.
-//	SPI_Write(readCmd, 4);
 }
 
 void ADAS_TEST_TONE(){
@@ -203,9 +171,5 @@ void ADAS_TEST_TONE(){
     ADAS1000_SetInactiveFrameWords(ADAS1000_RegVal_FRMCTL & ADAS1000_FRMCTL_WORD_MASK);
     
     ADAS1000_SetRegisterValue(ADAS1000_ECGCTL, ADAS1000_RegVal_ECGCTL);
-    
-    /* Get Frame Register without reading second time, starts */
-//    readCmd[0] = ADAS1000_FRAMES;	// Register address.
-//	SPI_Write(readCmd, 4);
 }
 

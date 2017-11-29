@@ -33,8 +33,6 @@ char FillingBuff;               // currently filling buffer (0,1))
 char radioBuff;                 // currently the radio buffer
 unsigned char Buffer0[64], Buffer1[64];
 unsigned char* radiodataptr;
-unsigned char doneRadioBuff=0;
-unsigned char lastRadioBuff;
 
 extern UINT8_T outBuf[MAX_OUT_BUF_SZ],      	///< Serial transmit buffer
       	txHead,                       	///< Read & write indexes for the output buffer
@@ -62,13 +60,9 @@ void High_Priority_ISR(void)		   // Interrupt fuction. Name is unimportant.
 void main() {
     /* Initialize variables used in the function */
     unsigned char init, i;
-    int command;
+    unsigned char command;
     char head_tail_diff;
-    int nBuffersOfData, nTotalBuffersOfData;
-    
-    nTotalBuffersOfData = 3;
-    
-    /* Initialize variables to read streamed data from the ADAS */
+    int nBuffersOfData, nTotalBuffersOfData;    
     
     /* Set the PIC clock frequency */
     OSCCON = 0b01110110; // set clock to 16 MHz //moved from below RNinit() to here)
@@ -76,17 +70,10 @@ void main() {
     /* Initialize the LCD */
     ANSELD = 0x00; // turn on digital input buffer
     TRISD  = 0x00; // LCD digital pins to output
-    LCDInit();  //uncommented, unsure why it was - ML - won't be necessary in final thing i guess - ML
-    
-    //initialize tester input output pin
-    TRISBbits.RB0 = 0; //init as output
-    ANSELBbits.ANSB0 = 0;
     
     //Initialize Serial port
     TRISCbits.RC6=1;  //switched from 1 to be an output
     TRISCbits.RC7=1;
-    //ANSELCbits.ANSC6=0;
-    //ANSELCbits.ANSC7=0;
     ANSELC=0x00;
     
     //initialize interrupts
@@ -97,8 +84,7 @@ void main() {
     
     InitBreak();
     SERInit();
-    //initialize RN
-    RNInit();  //uncommented, unsure why it was - ML
+    RNInit();
     
     /* Initialize the SPI interface with the ADAS */
     init = 0;
@@ -109,27 +95,32 @@ void main() {
     
 //   ADAS_DATA_INIT();                //configure and start the ADAS data flow
     ADAS_TEST_TONE();
-    AcquireECGData(25);
-    while(1){
-        command = recCommand(); //a program that receives from the rn, interprets it, and returns an int to be used in the switch case
+
+    while(command<=8){
         switch(command){
+                command = recCommand(); //a program that receives from the rn, interprets it, and returns an int to be used in the switch case
             case 1:
                 wakeADAS();  //a subroutine to wakeup the ADAS
+                // command = 2;
                 break;
             case 2:
                 setPacingParam();  //a subroutine to set the pacing parameters
+                // command = 3;
                 break;
             case 3:
                 setADASregister();  //subroutine that passes data collection parameters right into the ADAS
+                // command = 4;
                 break;
             case 4:
                 setDt(); //set for how long you would want to collect data
+                // command = 5;
                 break;
             case 5:
                 startPacing(); //if all parameters have been set, start pacing
+                // command = 6;
                 break;
             case 6:
-                acquireData(); //if all parameters have been set, record data for the amount of time specified by setDt, and continuously be sending it out to the photon
+                AcquireECGData(25); //if all parameters have been set, record data for the amount of time specified by setDt, and continuously be sending it out to the photon
                 break;
             case 7:
                 stopPacing(); //stop pacing the heart
