@@ -20,6 +20,7 @@
 #include "RN.h"
 #include "Serial.h"
 #include "ADASfxns.h"
+#include "mainbrain.h"
 
 extern GetRegisterValue();
 
@@ -61,6 +62,7 @@ void High_Priority_ISR(void)		   // Interrupt fuction. Name is unimportant.
 void main() {
     /* Initialize variables used in the function */
     unsigned char init, i;
+    int command;
     char head_tail_diff;
     int nBuffersOfData, nTotalBuffersOfData;
     
@@ -108,7 +110,37 @@ void main() {
 //   ADAS_DATA_INIT();                //configure and start the ADAS data flow
     ADAS_TEST_TONE();
     AcquireECGData(25);
-    while(1);
+    while(1){
+        command = recCommand(); //a program that receives from the rn, interprets it, and returns an int to be used in the switch case
+        switch(command){
+            case 1:
+                wakeADAS();  //a subroutine to wakeup the ADAS
+                break;
+            case 2:
+                setPacingParam();  //a subroutine to set the pacing parameters
+                break;
+            case 3:
+                setADASregister();  //subroutine that passes data collection parameters right into the ADAS
+                break;
+            case 4:
+                setDt(); //set for how long you would want to collect data
+                break;
+            case 5:
+                startPacing(); //if all parameters have been set, start pacing
+                break;
+            case 6:
+                acquireData(); //if all parameters have been set, record data for the amount of time specified by setDt, and continuously be sending it out to the photon
+                break;
+            case 7:
+                stopPacing(); //stop pacing the heart
+                break;
+            case 8:
+                resetParams(); //unnecessary fxn, but could maybe see use - reset all parameter values that were set
+                break;
+            default:
+                break;
+        }
+    };
 }
 
 void outputToLogicAnalyzer() {
