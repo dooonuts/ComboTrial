@@ -8,18 +8,23 @@
 #ifndef MAINBRAIN_H
 #define	MAINBRAIN_H
 
+#include <p18cxxx.h>
+#include <GenericTypeDefs.h>
 
+#include "General.h"
 
-unsigned char recCommand(void);
+UINT8_T recCommand(void);
 void wakeADAS(void);
-void setPacingParam(void);
+void setPacingParam(long T, long P);
 void setADASregister(void);
 unsigned char setDt(void);
 void startPacing(void);
-void acquireData(unsigned int);
+void acquireData(unsigned int nTotalBuffersOfData);
 void stopPacing(void);
 void resetParams(void);
-char* parseSerial(void);  //unsure how to declare this.  I want a char array[32]
+UINT8_T parseSerial(void);  //this acts on a global var now
+void parseVars(void);  //acts on the filled global char array from parseSErial
+void initRx(void);
 
 
 

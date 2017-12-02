@@ -33,6 +33,17 @@ char FillingBuff;               // currently filling buffer (0,1))
 char radioBuff;                 // currently the radio buffer
 unsigned char Buffer0[64], Buffer1[64];
 unsigned char* radiodataptr;
+unsigned char channel;
+
+
+extern int paceChannel;
+extern int recChannel;
+extern int PWMdur;
+extern int PWMamp;
+extern int paceDur;
+extern int recDur;
+extern char commandStr[64];
+
 
 extern UINT8_T outBuf[MAX_OUT_BUF_SZ],      	///< Serial transmit buffer
       	txHead,                       	///< Read & write indexes for the output buffer
@@ -62,7 +73,8 @@ void main() {
     unsigned char init, i;
     unsigned char command;
     char head_tail_diff;
-    int nBuffersOfData, nTotalBuffersOfData;    
+    int nBuffersOfData, nTotalBuffersOfData;
+    int notDone;
     
     /* Set the PIC clock frequency */
     OSCCON = 0b01110110; // set clock to 16 MHz //moved from below RNinit() to here)
@@ -82,9 +94,15 @@ void main() {
     IPR1bits.RC1IP = 1; //High priority
     IPR1bits.TX1IP = 1;
     
+    notDone = 1;
     InitBreak();
     SERInit();
     RNInit();
+    while(notDone){
+        initRx();
+        //notDone = parseSerial();        
+    }
+    parseVars();
     
     /* Initialize the SPI interface with the ADAS */
     init = 0;
@@ -104,7 +122,7 @@ void main() {
                 // command = 2;
                 break;
             case 2:
-                setPacingParam();  //a subroutine to set the pacing parameters
+                //setPacingParam();  //a subroutine to set the pacing parameters
                 // command = 3;
                 break;
             case 3:

@@ -13,6 +13,7 @@
       <itemPath>Serial.h</itemPath>
       <itemPath>ADAS1000.h</itemPath>
       <itemPath>mainbrain.h</itemPath>
+      <itemPath>Pacing.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -29,6 +30,7 @@
       <itemPath>../Matts_.X/Serial.c</itemPath>
       <itemPath>../Matts_.X/RN.c</itemPath>
       <itemPath>mainbrain.c</itemPath>
+      <itemPath>Pacing.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

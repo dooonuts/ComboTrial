@@ -10,6 +10,10 @@
 #include "mainbrain.h"
 #include "ADAS1000.h"
 #include "Communication.h"
+#include "Lcd.h"
+#include "General.h"
+#include "Serial.h"
+#include "RN.h"
 
 extern unsigned char RadioCnt = 0;
 extern unsigned char *FillingBuffPnt;   
@@ -18,6 +22,14 @@ extern char FillingBuff;               // currently filling buffer (0,1))
 extern char radioBuff;                 // currently the radio buffer
 extern unsigned char Buffer0[64], Buffer1[64];
 extern unsigned char* radiodataptr;
+
+int paceChannel;
+int recChannel;
+int PWMdur;
+int PWMamp;
+int paceDur;
+int recDur;
+char commandStr[64];
 /********************************************************************
 * Function:         recCommand
 * 
@@ -95,8 +107,27 @@ void wakeADAS(void){
 * @note    			
 */
 /*******************************************************************/
-void setPacingParam(void){
-    
+void setPacingParam(long T, long P){
+//    unsigned long PWn, IIn;
+//    
+//    IIn = (T-P)/2;
+//    PWn = P/2;
+//    unsigned int IntN = (int) IIn/50000;
+//    
+//    // calculate values to set capture compare registers
+//    FullIntH = (char) (IntN & 0xFF);
+//    FullIntL = (char) ((IntN >> 8) & 0xFF);
+//    
+//    unsigned int Remainder = (int) (IIn-((IntN-1)*50000))/2;
+//    ShortIntH = (char) (Remainder & 0xFF);
+//    ShortIntL = (char) ((Remainder >> 8) & 0xFF);
+//    
+//    PulseH = (char) (PWn & 0xFF);
+//    PulseL = (char) ((PWn >> 8) & 0xFF);
+//    
+//    CCP1CON = 0b00001011;
+//    T1GCON = 0b00000000;
+//    T1CON = 0b00110011;
 }
 
 /********************************************************************
@@ -153,7 +184,13 @@ void setADASregister(void){
 */
 /*******************************************************************/
 unsigned char setDt(void){
-    
+    //assuming we receive the time in seconds
+    float exactPackets;
+    int flooredPackets;
+    exactPackets = recDur / (32*10^-6);
+    flooredPackets = (int) exactPackets;
+    flooredPackets = (char) flooredPackets;
+    return(flooredPackets);    
 }
 
 /********************************************************************
@@ -392,7 +429,12 @@ void stopPacing(void){
 */
 /*******************************************************************/
 void resetParams(void){
-    
+    paceChannel = NULL;
+    recChannel = NULL;
+    PWMdur = NULL;
+    PWMamp = NULL;
+    paceDur = NULL;
+    recDur = NULL;    
 }
 
 /********************************************************************
@@ -421,6 +463,259 @@ void resetParams(void){
 * @note    			
 */
 /*******************************************************************/
-char* parseSerial(void){
-    
+UINT8_T parseSerial(void){
+    //define needed constants
+    unsigned int keepgoing;
+    char Uinput;
+    unsigned int count; //to iterate through inputstr
+    keepgoing = 1;
+    count = 0;
+    //loop to accomplish goal
+    while(keepgoing)
+    {
+        if(SERRxDatAvail())
+        {
+            Uinput=SERRxGet();
+            commandStr[count] = Uinput; //save input to our array
+            count++; //iterate count to move through the array
+            if (Uinput == '\n')
+            {
+                commandStr[count]=NULL; 
+                keepgoing=0;
+            }
+        }
+    }
+    return(0);
+}
+
+/********************************************************************
+* Function:         parseVars
+* 
+* PreCondition: 	None
+*
+* Side Effects: 	None
+*/
+/**
+* @ingroup  		Main
+*
+* @brief    		This function will parse the commandStr char array to extract
+ *                  the variable values, and place those values with the appropriate 
+ *                  global variable
+* 
+* @param			none 
+*
+* @result			{void}  this will act on global vars
+*
+* @note    			
+*/
+/*******************************************************************/
+void parseVars(void){
+    int switcher;
+    char temp[6];
+    int i;
+    int tempcount;
+    int breaker;
+    int count = 0;
+    switcher = 1;
+    tempcount = 0;
+    breaker = 1;
+    switch(switcher){
+            case 1:
+                while(breaker){
+                    if(commandStr[count]!='1'&&commandStr[count]!='2'&&commandStr[count]!='3'&&commandStr[count]!='4'&&commandStr[count]!='5'&&commandStr[count]!='6'&&commandStr[count]!='7'&&commandStr[count]!='8'&&commandStr[count]!='9'&&commandStr[count]!='0'){
+                        count++;
+                    }
+                    else{
+                        temp[tempcount] = commandStr[count];
+                        count++;
+                        while(1){
+                            if(commandStr[count]=='1'||commandStr[count]=='2'||commandStr[count]=='3'||commandStr[count]=='4'||commandStr[count]=='5'||commandStr[count]=='6'||commandStr[count]=='7'||commandStr[count]=='8'||commandStr[count]=='9'||commandStr[count]=='0'){
+                                tempcount++;
+                                temp[tempcount] = commandStr[count];
+                                count++;
+                            }
+                            else{
+                                tempcount = 0;
+                                count++;
+                                break;
+                            }
+                        }
+                        paceChannel = atoi(temp);
+                        i = 0;
+                        while(temp[i]){
+                            temp[i]=NULL;
+                            i++;
+                        }
+                        switcher = 2;
+                        breaker = 0;
+                    }
+                }
+                //break;
+            case 2:
+                breaker = 1;
+                while(breaker){
+                    if(commandStr[count]!='1'&&commandStr[count]!='2'&&commandStr[count]!='3'&&commandStr[count]!='4'&&commandStr[count]!='5'&&commandStr[count]!='6'&&commandStr[count]!='7'&&commandStr[count]!='8'&&commandStr[count]!='9'&&commandStr[count]!='0'){
+                        count++;
+                    }
+                    else{
+                        temp[tempcount] = commandStr[count];
+                        count++;
+                        while(1){
+                            if(commandStr[count]=='1'||commandStr[count]=='2'||commandStr[count]=='3'||commandStr[count]=='4'||commandStr[count]=='5'||commandStr[count]=='6'||commandStr[count]=='7'||commandStr[count]=='8'||commandStr[count]=='9'||commandStr[count]=='0'){
+                                tempcount++;
+                                temp[tempcount] = commandStr[count];
+                                count++;
+                            }
+                            else{
+                                tempcount = 0;
+                                count++;
+                                break;
+                            }
+                        }
+                        recChannel = atoi(temp);
+                        i = 0;
+                        while(temp[i]){
+                            temp[i]=NULL;
+                            i++;
+                        }
+                        switcher = 3;
+                        breaker = 0;
+                    }  
+                }
+                //break;
+            case 3:
+                breaker = 1;
+                while(breaker){
+                    if(commandStr[count]!='1'&&commandStr[count]!='2'&&commandStr[count]!='3'&&commandStr[count]!='4'&&commandStr[count]!='5'&&commandStr[count]!='6'&&commandStr[count]!='7'&&commandStr[count]!='8'&&commandStr[count]!='9'&&commandStr[count]!='0'){
+                        count++;
+                    }
+                    else{
+                        temp[tempcount] = commandStr[count];
+                        count++;
+                        while(1){
+                            if(commandStr[count]=='1'||commandStr[count]=='2'||commandStr[count]=='3'||commandStr[count]=='4'||commandStr[count]=='5'||commandStr[count]=='6'||commandStr[count]=='7'||commandStr[count]=='8'||commandStr[count]=='9'||commandStr[count]=='0'){
+                                tempcount++;
+                                temp[tempcount] = commandStr[count];
+                                count++;
+                            }
+                            else{
+                                tempcount = 0;
+                                count++;
+                                break;
+                            }
+                        }
+                        PWMdur = atoi(temp);
+                        i = 0;
+                        while(temp[i]){
+                            temp[i]=NULL;
+                            i++;
+                        }
+                        switcher = 4;
+                        breaker = 0;
+                    } 
+                }
+                //break;
+            case 4:
+                breaker = 1;
+                while(breaker){
+                    if(commandStr[count]!='1'&&commandStr[count]!='2'&&commandStr[count]!='3'&&commandStr[count]!='4'&&commandStr[count]!='5'&&commandStr[count]!='6'&&commandStr[count]!='7'&&commandStr[count]!='8'&&commandStr[count]!='9'&&commandStr[count]!='0'){
+                        count++;
+                    }
+                    else{
+                        temp[tempcount] = commandStr[count];
+                        count++;
+                        while(1){
+                            if(commandStr[count]=='1'||commandStr[count]=='2'||commandStr[count]=='3'||commandStr[count]=='4'||commandStr[count]=='5'||commandStr[count]=='6'||commandStr[count]=='7'||commandStr[count]=='8'||commandStr[count]=='9'||commandStr[count]=='0'){
+                                tempcount++;
+                                temp[tempcount] = commandStr[count];
+                                count++;
+                            }
+                            else{
+                                tempcount = 0;
+                                count++;
+                                break;
+                            }
+                        }
+                        PWMamp = atoi(temp);
+                        i = 0;
+                        while(temp[i]){
+                            temp[i]=NULL;
+                            i++;
+                        }
+                        switcher = 5;
+                        breaker = 0;
+                    }
+                }
+                //break;
+            case 5:
+                breaker = 1;
+                while(breaker){
+                    if(commandStr[count]!='1'&&commandStr[count]!='2'&&commandStr[count]!='3'&&commandStr[count]!='4'&&commandStr[count]!='5'&&commandStr[count]!='6'&&commandStr[count]!='7'&&commandStr[count]!='8'&&commandStr[count]!='9'&&commandStr[count]!='0'){
+                        count++;
+                    }
+                    else{
+                        temp[tempcount] = commandStr[count];
+                        count++;
+                        while(1){
+                            if(commandStr[count]=='1'||commandStr[count]=='2'||commandStr[count]=='3'||commandStr[count]=='4'||commandStr[count]=='5'||commandStr[count]=='6'||commandStr[count]=='7'||commandStr[count]=='8'||commandStr[count]=='9'||commandStr[count]=='0'){
+                                tempcount++;
+                                temp[tempcount] = commandStr[count];
+                                count++;
+                            }
+                            else{
+                                tempcount = 0;
+                                count++;
+                                break;
+                            }
+                        }
+                        paceDur = atoi(temp);
+                        i = 0;
+                        while(temp[i]){
+                            temp[i]=NULL;
+                            i++;
+                        }
+                        switcher = 6;
+                        breaker = 0;
+                    }
+                }
+                //break;
+            case 6:
+                breaker = 1;
+                while(breaker){
+                    if(commandStr[count]!='1'&&commandStr[count]!='2'&&commandStr[count]!='3'&&commandStr[count]!='4'&&commandStr[count]!='5'&&commandStr[count]!='6'&&commandStr[count]!='7'&&commandStr[count]!='8'&&commandStr[count]!='9'&&commandStr[count]!='0'){
+                        count++;
+                    }
+                    else{
+                        temp[tempcount] = commandStr[count];
+                        count++;
+                        while(1){
+                            if(commandStr[count]=='1'||commandStr[count]=='2'||commandStr[count]=='3'||commandStr[count]=='4'||commandStr[count]=='5'||commandStr[count]=='6'||commandStr[count]=='7'||commandStr[count]=='8'||commandStr[count]=='9'||commandStr[count]=='0'){
+                                tempcount++;
+                                temp[tempcount] = commandStr[count];
+                                count++;
+                            }
+                            else{
+                                tempcount = 0;
+                                count++;
+                                break;
+                            }
+                        }
+                        recDur = atoi(temp);
+                        i = 0;
+                        while(temp[i]){
+                            temp[i]=NULL;
+                            i++;
+                        }
+                        breaker = 0;
+                    }
+                }
+                break;                
+            default:
+                break;
+    }
+}
+
+void initRx(void){
+    SERSendStr("radio rx 0\r\n");
+    CheckResponse();
 }

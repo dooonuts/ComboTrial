@@ -1,19 +1,20 @@
-Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 227 : call of function without prototype
-Warning[2054] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 231 : suspicious pointer conversion
-Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 243 : call of function without prototype
-Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 247 : call of function without prototype
-Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 249 : call of function without prototype
-Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 257 : call of function without prototype
-Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 265 : call of function without prototype
-Warning[2054] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 269 : suspicious pointer conversion
-Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 281 : call of function without prototype
-Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 285 : call of function without prototype
-Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 287 : call of function without prototype
-Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 295 : call of function without prototype
-Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 303 : call of function without prototype
-Warning[2054] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 307 : suspicious pointer conversion
-Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 316 : call of function without prototype
-Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 319 : call of function without prototype
-Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 329 : call of function without prototype
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 264 : call of function without prototype
+Warning[2054] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 268 : suspicious pointer conversion
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 280 : type qualifier mismatch in assignment
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 284 : call of function without prototype
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 286 : type qualifier mismatch in assignment
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 294 : call of function without prototype
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 302 : call of function without prototype
+Warning[2054] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 306 : suspicious pointer conversion
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 318 : type qualifier mismatch in assignment
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 322 : call of function without prototype
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 324 : type qualifier mismatch in assignment
 Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 332 : call of function without prototype
 Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 340 : call of function without prototype
+Warning[2054] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 344 : suspicious pointer conversion
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 353 : type qualifier mismatch in assignment
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 356 : call of function without prototype
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 366 : type qualifier mismatch in assignment
+Warning[2058] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 369 : call of function without prototype
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 377 : type qualifier mismatch in assignment
+Warning[2066] C:\Users\BME464\Desktop\ComboTrial\mainbrain.c 719 : type qualifier mismatch in assignment
