@@ -8,6 +8,7 @@
 #ifndef PACING_H
 #define	PACING_H
 
+#define PACING_OUTPUT  LATAbits.LATA5
 void setPacingParam();
 void startPacing();
 void endPacing();
