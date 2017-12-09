@@ -42,13 +42,21 @@
 *   @brief 	This modules includes all service functions for Serial
 *           RS232 operations.
 *   @defgroup Serial	RS232 Connector (Serial)
-* 
+*   
 */
 #include <p18cxxx.h>
 #include <GenericTypeDefs.h>
 
 #include "General.h"
 #include "Serial.h"
+
+#define MAX_OUT_BUF_SZ 30				///< Output buffer size
+#define MAX_IN_BUF_SZ  30				///< Input buffer size
+
+#define BAUD2400_16MHZ 103				///< UART setting for 2400 baud at 16 MHz Fosc
+#define BAUD2400_4MHZ  25				///< UART setting for 2400 baud at 4 MHz Fosc
+
+//extern unsigned char                      //for pacing
 
 UINT8_T outBuf[MAX_OUT_BUF_SZ],      	///< Serial transmit buffer
       	txHead,                       	///< Read & write indexes for the output buffer
@@ -85,22 +93,25 @@ void Serial_ISR (void)
 {
 /******************************* SERIAL RECEPTION ***************************/
 
-  if ((PIR1bits.RCIF) && (PIE1bits.RCIE))   // If a new character has been received
-  {
+  if ((PIR1bits.RCIF) && (PIE1bits.RCIE)){   // If a new character has been received
     SERRxSave(RCREG1);                 		// Go store the new character in Rx buffer
     PIR1bits.RCIF = CLEAR;                  // Receive event has been serviced
-    //LATBbits.LATB0 = 0;
+    if (PIR1bits.RCIF){                     // another character available?
+        SERRxSave(RCREG1);                 		// Go store the new character in Rx buffer
+        PIR1bits.RCIF = CLEAR;
+    }
   }   										// If new character has been received                                  
 
 /***************************** SERIAL TRANSMISSION ****************************/
 
 //  if((PIR1bits.TXIF) && (PIE1bits.TXIE))    // If end of transmit
 //  {
-//   if (SERTxDatAvail())             // If data available for output
+//    if (SERTxDatAvail())             // If data available for output
 //	{
 //      	SERSendNext();               // Go send next available character
 //	}
 //  }
+  
     if((PIR1bits.TXIF) && (PIE1bits.TXIE)) {   // If hardware end of transmit
         if (txHead != txTail) {             // If Buffer not empty yet  
             PIE1bits.TXIE = ENABLE;         // Enable transmission
@@ -118,8 +129,30 @@ void Serial_ISR (void)
         else PIE1bits.TXIE = DISABLE;       // Otherwise buffer is empty => no need to send anymore
                                             // Disable transmission
     }
+//    if((PIR1bits.CCP1IF && PIE1bits.CCP1IE)) {
+//        IntCounter--;
+//        if (IntCounter <= 3) {
+//            if (IntCounter == 3){
+//                CCPR1H = ShortIntH;
+//                CCPR1L = ShortIntL;
+//            }
+//            else if (IntCounter == 1){
+//                CCPR1H = PulseH;
+//                CCPR1L = PulseL;
+//                // set the output bit //
+//            }
+//            else if (IntCounter == 0){
+//                IntCounter = IntMaxCount;
+//                // clear the output bit
+//                CCPR1H = FullIntH;
+//                CCPR1L = FullIntL;
+//            }
+//        }
+//        PIR1bits.CCP1IF = 0;                      // clear source of interupt
+//    }
+  
 }
-//
+
 ///////////////////////////////////////////////////////////////////////////////
 //*****************************************************************************
 // SUPPORT FUNCTIONS
@@ -151,6 +184,7 @@ void Serial_ISR (void)
 
 void SERInit(void)
 {
+    unsigned char i;
 // Transmit non-inverted data to the RB7/TX/CK; 8 bit BRG used; 
 // Receiver operates normal; Aut-Baud Detect is disabled
 
@@ -164,7 +198,7 @@ void SERInit(void)
   // Set up the UART
 
   SPBRG1   = 34;     // ** modified from original for 8MHz 57.6K baud (page 274))
-  TXSTA1bits.SYNC = CLEAR;                    // Transmission is asynchronous
+  TXSTA1bits.SYNC = CLEAR;                    // Transmisson is asynchronous
   RCSTA1bits.SPEN = ENABLE;                   // Enable serial port
   TXSTA1bits.TXEN = ENABLE;                   // Enable EUSART Transmit Operation
   RCSTA1bits.CREN = ENABLE;                   // Enable EUSART Receive Operation
@@ -175,6 +209,7 @@ void SERInit(void)
   PIR1bits.TX1IF = CLEAR;                     // Clear USART Transmit Interrupt Flag
 
   rxHead = rxTail = txHead = txTail = CLEAR;  // Initialize all Read & Write Indexes
+  for (i=0; i<MAX_IN_BUF_SZ;i++)inBuf[i] = 0;
 }
 
 /********************************************************************
@@ -284,8 +319,10 @@ BOOL SERRxDatAvail(void)
 UINT8_T SERRxGet(void)
 {
   UINT8_T c;
+  INTCONbits.GIE = CLEAR;  //momentarily disable interrupts
   c = inBuf[rxTail];		      // Read next character from buffer
   rxTail = IncNdx(rxTail,MAX_IN_BUF_SZ);       // Prepare to read next character
+  INTCONbits.GIE = SET;   //re-enable interrupts;
   return(c);						// Return received char
 }	
 
@@ -311,6 +348,7 @@ UINT8_T SERRxGet(void)
 
 void SERTxSave(UINT8_T value)
 {
+    INTCONbits.GIE = CLEAR;    //added
   outBuf[txHead] = value;                 // Store char to send in output buffer
   txHead = IncNdx(txHead,MAX_OUT_BUF_SZ);         // Prepare next write location
   if (txHead == txTail)                      // If writing to next read location
@@ -318,6 +356,7 @@ void SERTxSave(UINT8_T value)
     txTail = IncNdx(txTail,MAX_OUT_BUF_SZ);                     // Write farther
   }
   PIE1bits.TXIE = ENABLE;                    	                      // Enable transmit
+  INTCONbits.GIE = SET;
 }	
 
 /********************************************************************
@@ -376,8 +415,10 @@ BOOL SERTxDatAvail(void)
 
 void SERSendNext(void)
 {
+    INTCONbits.GIE = CLEAR;  //momentarily disable interrupts
   TXREG = outBuf[txTail];                     // Output next available character
   txTail = IncNdx(txTail,MAX_OUT_BUF_SZ);  // Select next char to be transmitted
+  INTCONbits.GIE = SET;   //reenable interrupts
 }
 
 /********************************************************************

@@ -51,17 +51,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=ADASfxns.c ADAS1000.c Communication.c Lcd.c main.c ../Matts_.X/Serial.c ../Matts_.X/RN.c mainbrain.c Pacing.c
+SOURCEFILES_QUOTED_IF_SPACED=ADASfxns.c ADAS1000.c Communication.c Lcd.c main.c mainbrain.c Pacing.c Serial.c RN.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/ADASfxns.o ${OBJECTDIR}/ADAS1000.o ${OBJECTDIR}/Communication.o ${OBJECTDIR}/Lcd.o ${OBJECTDIR}/main.o ${OBJECTDIR}/_ext/178502183/Serial.o ${OBJECTDIR}/_ext/178502183/RN.o ${OBJECTDIR}/mainbrain.o ${OBJECTDIR}/Pacing.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/ADASfxns.o.d ${OBJECTDIR}/ADAS1000.o.d ${OBJECTDIR}/Communication.o.d ${OBJECTDIR}/Lcd.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/_ext/178502183/Serial.o.d ${OBJECTDIR}/_ext/178502183/RN.o.d ${OBJECTDIR}/mainbrain.o.d ${OBJECTDIR}/Pacing.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/ADASfxns.o ${OBJECTDIR}/ADAS1000.o ${OBJECTDIR}/Communication.o ${OBJECTDIR}/Lcd.o ${OBJECTDIR}/main.o ${OBJECTDIR}/mainbrain.o ${OBJECTDIR}/Pacing.o ${OBJECTDIR}/Serial.o ${OBJECTDIR}/RN.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/ADASfxns.o.d ${OBJECTDIR}/ADAS1000.o.d ${OBJECTDIR}/Communication.o.d ${OBJECTDIR}/Lcd.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/mainbrain.o.d ${OBJECTDIR}/Pacing.o.d ${OBJECTDIR}/Serial.o.d ${OBJECTDIR}/RN.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/ADASfxns.o ${OBJECTDIR}/ADAS1000.o ${OBJECTDIR}/Communication.o ${OBJECTDIR}/Lcd.o ${OBJECTDIR}/main.o ${OBJECTDIR}/_ext/178502183/Serial.o ${OBJECTDIR}/_ext/178502183/RN.o ${OBJECTDIR}/mainbrain.o ${OBJECTDIR}/Pacing.o
+OBJECTFILES=${OBJECTDIR}/ADASfxns.o ${OBJECTDIR}/ADAS1000.o ${OBJECTDIR}/Communication.o ${OBJECTDIR}/Lcd.o ${OBJECTDIR}/main.o ${OBJECTDIR}/mainbrain.o ${OBJECTDIR}/Pacing.o ${OBJECTDIR}/Serial.o ${OBJECTDIR}/RN.o
 
 # Source Files
-SOURCEFILES=ADASfxns.c ADAS1000.c Communication.c Lcd.c main.c ../Matts_.X/Serial.c ../Matts_.X/RN.c mainbrain.c Pacing.c
+SOURCEFILES=ADASfxns.c ADAS1000.c Communication.c Lcd.c main.c mainbrain.c Pacing.c Serial.c RN.c
 
 
 CFLAGS=
@@ -135,22 +135,6 @@ ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${DEP_GEN} -d ${OBJECTDIR}/main.o 
 	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
 	
-${OBJECTDIR}/_ext/178502183/Serial.o: ../Matts_.X/Serial.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/_ext/178502183" 
-	@${RM} ${OBJECTDIR}/_ext/178502183/Serial.o.d 
-	@${RM} ${OBJECTDIR}/_ext/178502183/Serial.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -p$(MP_PROCESSOR_OPTION) --verbose -ms -oa-  -I ${MP_CC_DIR}\\..\\h  -fo ${OBJECTDIR}/_ext/178502183/Serial.o   ../Matts_.X/Serial.c 
-	@${DEP_GEN} -d ${OBJECTDIR}/_ext/178502183/Serial.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/178502183/Serial.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
-	
-${OBJECTDIR}/_ext/178502183/RN.o: ../Matts_.X/RN.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/_ext/178502183" 
-	@${RM} ${OBJECTDIR}/_ext/178502183/RN.o.d 
-	@${RM} ${OBJECTDIR}/_ext/178502183/RN.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -p$(MP_PROCESSOR_OPTION) --verbose -ms -oa-  -I ${MP_CC_DIR}\\..\\h  -fo ${OBJECTDIR}/_ext/178502183/RN.o   ../Matts_.X/RN.c 
-	@${DEP_GEN} -d ${OBJECTDIR}/_ext/178502183/RN.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/178502183/RN.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
-	
 ${OBJECTDIR}/mainbrain.o: mainbrain.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/mainbrain.o.d 
@@ -166,6 +150,22 @@ ${OBJECTDIR}/Pacing.o: Pacing.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE) -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -p$(MP_PROCESSOR_OPTION) --verbose -ms -oa-  -I ${MP_CC_DIR}\\..\\h  -fo ${OBJECTDIR}/Pacing.o   Pacing.c 
 	@${DEP_GEN} -d ${OBJECTDIR}/Pacing.o 
 	@${FIXDEPS} "${OBJECTDIR}/Pacing.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
+	
+${OBJECTDIR}/Serial.o: Serial.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/Serial.o.d 
+	@${RM} ${OBJECTDIR}/Serial.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -p$(MP_PROCESSOR_OPTION) --verbose -ms -oa-  -I ${MP_CC_DIR}\\..\\h  -fo ${OBJECTDIR}/Serial.o   Serial.c 
+	@${DEP_GEN} -d ${OBJECTDIR}/Serial.o 
+	@${FIXDEPS} "${OBJECTDIR}/Serial.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
+	
+${OBJECTDIR}/RN.o: RN.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/RN.o.d 
+	@${RM} ${OBJECTDIR}/RN.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -p$(MP_PROCESSOR_OPTION) --verbose -ms -oa-  -I ${MP_CC_DIR}\\..\\h  -fo ${OBJECTDIR}/RN.o   RN.c 
+	@${DEP_GEN} -d ${OBJECTDIR}/RN.o 
+	@${FIXDEPS} "${OBJECTDIR}/RN.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
 	
 else
 ${OBJECTDIR}/ADASfxns.o: ADASfxns.c  nbproject/Makefile-${CND_CONF}.mk
@@ -208,22 +208,6 @@ ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${DEP_GEN} -d ${OBJECTDIR}/main.o 
 	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
 	
-${OBJECTDIR}/_ext/178502183/Serial.o: ../Matts_.X/Serial.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/_ext/178502183" 
-	@${RM} ${OBJECTDIR}/_ext/178502183/Serial.o.d 
-	@${RM} ${OBJECTDIR}/_ext/178502183/Serial.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -p$(MP_PROCESSOR_OPTION) --verbose -ms -oa-  -I ${MP_CC_DIR}\\..\\h  -fo ${OBJECTDIR}/_ext/178502183/Serial.o   ../Matts_.X/Serial.c 
-	@${DEP_GEN} -d ${OBJECTDIR}/_ext/178502183/Serial.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/178502183/Serial.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
-	
-${OBJECTDIR}/_ext/178502183/RN.o: ../Matts_.X/RN.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/_ext/178502183" 
-	@${RM} ${OBJECTDIR}/_ext/178502183/RN.o.d 
-	@${RM} ${OBJECTDIR}/_ext/178502183/RN.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -p$(MP_PROCESSOR_OPTION) --verbose -ms -oa-  -I ${MP_CC_DIR}\\..\\h  -fo ${OBJECTDIR}/_ext/178502183/RN.o   ../Matts_.X/RN.c 
-	@${DEP_GEN} -d ${OBJECTDIR}/_ext/178502183/RN.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/178502183/RN.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
-	
 ${OBJECTDIR}/mainbrain.o: mainbrain.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/mainbrain.o.d 
@@ -239,6 +223,22 @@ ${OBJECTDIR}/Pacing.o: Pacing.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE) -p$(MP_PROCESSOR_OPTION) --verbose -ms -oa-  -I ${MP_CC_DIR}\\..\\h  -fo ${OBJECTDIR}/Pacing.o   Pacing.c 
 	@${DEP_GEN} -d ${OBJECTDIR}/Pacing.o 
 	@${FIXDEPS} "${OBJECTDIR}/Pacing.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
+	
+${OBJECTDIR}/Serial.o: Serial.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/Serial.o.d 
+	@${RM} ${OBJECTDIR}/Serial.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -p$(MP_PROCESSOR_OPTION) --verbose -ms -oa-  -I ${MP_CC_DIR}\\..\\h  -fo ${OBJECTDIR}/Serial.o   Serial.c 
+	@${DEP_GEN} -d ${OBJECTDIR}/Serial.o 
+	@${FIXDEPS} "${OBJECTDIR}/Serial.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
+	
+${OBJECTDIR}/RN.o: RN.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/RN.o.d 
+	@${RM} ${OBJECTDIR}/RN.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -p$(MP_PROCESSOR_OPTION) --verbose -ms -oa-  -I ${MP_CC_DIR}\\..\\h  -fo ${OBJECTDIR}/RN.o   RN.c 
+	@${DEP_GEN} -d ${OBJECTDIR}/RN.o 
+	@${FIXDEPS} "${OBJECTDIR}/RN.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c18 
 	
 endif
 

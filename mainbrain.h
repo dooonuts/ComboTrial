@@ -17,12 +17,12 @@ UINT8_T recCommand(void);
 void wakeADAS(void);
 void setPacingParam(long T, long P);
 void setADASregister(void);
-unsigned char setDt(void);
+unsigned int setDt(void);
 void startPacing(void);
 void acquireData(unsigned int nTotalBuffersOfData);
 void stopPacing(void);
 void resetParams(void);
-UINT8_T parseSerial(void);  //this acts on a global var now
+void parseSerial(void);  //this acts on a global var now
 void parseVars(void);  //acts on the filled global char array from parseSErial
 void initRx(void);
 

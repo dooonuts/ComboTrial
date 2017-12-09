@@ -44,6 +44,7 @@ extern int paceDur;
 extern int recDur;
 extern char commandStr[64];
 
+int test;
 
 extern UINT8_T outBuf[MAX_OUT_BUF_SZ],      	///< Serial transmit buffer
       	txHead,                       	///< Read & write indexes for the output buffer
@@ -98,11 +99,20 @@ void main() {
     InitBreak();
     SERInit();
     RNInit();
+    initRx();
     while(notDone){
-        initRx();
-        //notDone = parseSerial();        
+        parseSerial();
+        if(commandStr[6]=='e' && commandStr[7]=='r'){
+            initRx();
+        }
+        else{
+            notDone = 0;
+            //initRx(); //in for testing, continous loop
+        }
     }
     parseVars();
+    
+    test = paceChannel;
     
     /* Initialize the SPI interface with the ADAS */
     init = 0;
@@ -113,43 +123,49 @@ void main() {
     
 //   ADAS_DATA_INIT();                //configure and start the ADAS data flow
     ADAS_TEST_TONE();
-
+    
+    command = 6;
     while(command<=8){
         switch(command){
-                command = recCommand(); //a program that receives from the rn, interprets it, and returns an int to be used in the switch case
+            // command = recCommand(); //a program that receives from the rn, interprets it, and returns an int to be used in the switch case
             case 1:
                 wakeADAS();  //a subroutine to wakeup the ADAS
-                // command = 2;
+                command = command + 1;
                 break;
             case 2:
                 //setPacingParam();  //a subroutine to set the pacing parameters
-                // command = 3;
+                command = command + 1;
                 break;
             case 3:
                 setADASregister();  //subroutine that passes data collection parameters right into the ADAS
-                // command = 4;
+                command = command + 1;
                 break;
             case 4:
                 setDt(); //set for how long you would want to collect data
-                // command = 5;
+                command = command + 1;
                 break;
             case 5:
                 startPacing(); //if all parameters have been set, start pacing
-                // command = 6;
+                command = command + 1;
                 break;
             case 6:
-                AcquireECGData(25); //if all parameters have been set, record data for the amount of time specified by setDt, and continuously be sending it out to the photon
+                AcquireECGData(5); //if all parameters have been set, record data for the amount of time specified by setDt, and continuously be sending it out to the photon
+                command = 12;
                 break;
             case 7:
                 stopPacing(); //stop pacing the heart
+                command = command + 1;
                 break;
             case 8:
                 resetParams(); //unnecessary fxn, but could maybe see use - reset all parameter values that were set
+                command = command + 1;
                 break;
             default:
                 break;
         }
     };
+    while(1);
+    
 }
 
 void outputToLogicAnalyzer() {

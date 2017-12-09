@@ -5,17 +5,18 @@
 #include <stdio.h>
 #include <string.h>
 
-int OKResponse;
-int done;
-char Uinputstr[32];   //a place to store all incoming chars from uart
+unsigned char OKResponse;
+unsigned char done;
+unsigned char Uinputstr[24];   //a place to store all incoming chars from uart
 
 
 void CheckResponse()
 {
     //define needed constants
-    unsigned int keepgoing;
+    unsigned char keepgoing;
     char Uinput;
-    unsigned int count = 0; //to iterate through inputstr
+    unsigned char count = 0; //to iterate through inputstr  pdw 11/21
+
     OKResponse = 0; //set this so that we can cause the program to wait until this is 1;
     keepgoing = 1;
     LCDGoto(0,0);
@@ -55,90 +56,63 @@ void RNInit()
         if(i==0)
         {
             checked = SERSendStr("U\r\n");
-            while(checked==1 && done==0)
-            {
-                CheckResponse();
-            }
+            while(checked==1 && done==0)CheckResponse();
             checked = 0;
             done = 0;
         }
         else if(i==1)
         {
             checked = SERSendStr("mac pause\r\n");
-            while(checked==1 && done==0)
-            {
-                CheckResponse();
-            }
+            while(checked==1 && done==0)CheckResponse();
             checked = 0;
             done = 0;
         }
         else if(i==2)
         {
             checked = SERSendStr("radio set mod fsk\r\n");
-            while(checked==1 && done==0)
-            {
-                CheckResponse();
-            }
+            while(checked==1 && done==0)CheckResponse();
             checked = 0;
             done = 0;
         }
         else if(i==3)
         {
             checked = SERSendStr("radio set freq 434000000\r\n");
-            while(checked==1 && done==0)
-            {
-                CheckResponse();
-            }
+            while(checked==1 && done==0)CheckResponse();
             checked = 0;
             done = 0;
         }
         else if(i==4)
         {
             checked = SERSendStr("radio set bitrate 250000\r\n");
-            while(checked==1 && done==0)
-            {
-                CheckResponse();
-            }
+            while(checked==1 && done==0)CheckResponse();
             checked = 0;
             done = 0;
         }
         else if(i==5)
         {
             checked = SERSendStr("radio set prlen 48\r\n");
-            while(checked==1 && done==0)
-            {
-                CheckResponse();
-            }
+            while(checked==1 && done==0)CheckResponse();
             checked = 0;
             done = 0;
         }
         else if(i==6)
         {
             checked = SERSendStr("radio set afcbw 166.7\r\n");
-            while(checked==1 && done==0)
-            {
-                CheckResponse();
-            }
+            while(checked==1 && done==0)CheckResponse();
             checked = 0;
             done = 0;
         }
         else if(i==7)
         {
             checked = SERSendStr("radio set rxbw 100\r\n");
-            while(checked==1 && done==0)
-            {
-                CheckResponse();
-            }
+            while(checked==1 && done==0)CheckResponse();
             checked = 0;
             done = 0;
         }
         else
         {
             checked = SERSendStr("radio set fdev 100000\r\n");
-            while(checked==1 && done==0)
-            {
-                CheckResponse();
-            }
+            while(checked==1 && done==0)CheckResponse();
             checked = 0;
             done = 0;
         }
@@ -152,7 +126,7 @@ UINT8_T RNTrans(/* need to determine whats going into a packet to input here */ 
     char point; //doesn't matter what its set to, just cannot be null
     OKResponse = 0;
     //now we can send things out
-    //LATBbits.LATB0 = ~LATBbits.LATB0; //~the general io pin of choice ~LATBbits.RB1; 
+    LATBbits.LATB0 = ~LATBbits.LATB0; //~the general io pin of choice ~LATBbits.RB1; 
     SERSendStr("radio tx ");
     SERSendData(packet);
     SERSendStr("\r\n");  //need to append \r\n to our commands

@@ -183,13 +183,13 @@ void setADASregister(void){
 * @note    			
 */
 /*******************************************************************/
-unsigned char setDt(void){
+unsigned int setDt(void){
     //assuming we receive the time in seconds
     float exactPackets;
     int flooredPackets;
-    exactPackets = recDur / (32*10^-6);
+    exactPackets = recDur / (32*10^-3);
     flooredPackets = (int) exactPackets;
-    flooredPackets = (char) flooredPackets;
+    //flooredPackets = (char) flooredPackets;
     return(flooredPackets);    
 }
 
@@ -463,7 +463,7 @@ void resetParams(void){
 * @note    			
 */
 /*******************************************************************/
-UINT8_T parseSerial(void){
+void parseSerial(void){
     //define needed constants
     unsigned int keepgoing;
     char Uinput;
@@ -522,7 +522,7 @@ void parseVars(void){
     switch(switcher){
             case 1:
                 while(breaker){
-                    if(commandStr[count]!='1'&&commandStr[count]!='2'&&commandStr[count]!='3'&&commandStr[count]!='4'&&commandStr[count]!='5'&&commandStr[count]!='6'&&commandStr[count]!='7'&&commandStr[count]!='8'&&commandStr[count]!='9'&&commandStr[count]!='0'){
+                    if(commandStr[count]!='1'&&commandStr[count]!='2'&&commandStr[count]!='3'&&commandStr[count]!='4'&&commandStr[count]!='5'&&commandStr[count]!='6'&&commandStr[count]!='7'&&commandStr[count]!='8'&&commandStr[count]!='9'){
                         count++;
                     }
                     else{
@@ -716,6 +716,6 @@ void parseVars(void){
 }
 
 void initRx(void){
-    SERSendStr("radio rx 0\r\n");
+    SERSendStr("radio rx 250\r\n");
     CheckResponse();
 }
